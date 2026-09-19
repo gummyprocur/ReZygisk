@@ -1,78 +1,56 @@
 # ReZygisk
 
-[简体中文](/READMEs/README_zh-CN.md)
+ReZygisk 是 Zygisk Next 的一个分支，是 Zygisk 的独立实现，为 KernelSU、APatch 和 Magisk 提供 Zygisk API 支持。
 
-ReZygisk is a fork of Zygisk Next, a standalone implementation of Zygisk, providing Zygisk API support for KernelSU, APatch and Magisk.
+代码库已经完全重写为 C 语言，这不仅带来了更干净、更易读的代码库，还让生成的二进制文件更轻量、更快速。同时还引入了自定义链接器，在正常情况下完全不使用系统链接器，从而让 ReZygisk 能够应对未来的检测，并规避所有基于链接器的检测。
 
-The codebase has been rewritten to C entirely, bringing not only a much cleaner codebase that is easier to follow, but also a lighter binaries that are also faster. Custom linkers also have been introduced to future-proof ReZygisk against future detections, not using system linker at all in normal circunstances, defeating any linker-based detection.
+## 为什么？
 
-## Why?
+Zygisk Next 的最新版本不是开源的，其代码完全由其开发者保留。这不仅限制了我们为项目做出贡献的能力，也使得代码审计变得不可能，这是一个重大的安全隐患，因为 Zygisk Next 是一个以超级用户 (root) 权限运行的模块，可以访问整个系统。
 
-The latest releases of Zygisk Next are not open-source, reserving entirely the code for its developers. Not only does that limit our ability to contribute to the project, but also impossibilities the audit of the code, which is a major security concern, as Zygisk Next is a module that runs with superuser (root) privileges, having access to the entire system.
+Zygisk Next 的开发者是 Android 社区中著名且值得信赖的，然而，这并不意味着代码没有恶意或漏洞。我们 (PerformanC) 理解他们保持代码闭源的原因，但我们持相反的观点。
 
-The Zygisk Next developers are famous and trusted in the Android community, however, this doesn't mean that the code is not malicious or vulnerable. We (PerformanC) understand they have their reasons to keep the code closed-source, but we believe the contrary.
+## 优势
 
-## Advantages
+- **自由开源 (永远)**
 
-- FOSS (Forever)
+## 依赖项
 
-## Dependencies
+| 工具              | 描述                               |
+|-------------------|------------------------------------|
+| `Android NDK`     | Android 原生开发工具包             |
 
-| Tool            | Description                            |
-|-----------------|----------------------------------------|
-| `Android NDK`   | Native Development Kit for Android     |
+### C++ 依赖项
 
-### C Dependencies
+| 依赖项        | 描述                                |
+|---------------|-------------------------------------|
+| `lsplt`       | Android 的简单 PLT Hook 库          |
+| `CSOLoader`   | 最先进（SOTA）的 Linux 自定义链接器 |
 
-| Dependency  | Description                   |
-|-------------|-------------------------------|
-| `PLTI`      | Simple PLT Hook for Android   |
-| `CSOLoader` | SOTA Linux custom linker      |
+## 安装
 
-## Installation
+### 1. 选择正确的 zip 文件
 
-### 1. Select the right zip
+选择正确的构建版本/zip 文件很重要，因为它将决定 ReZygisk 的隐藏性和稳定性。不过，这并不是一项艰巨的任务：
 
-The selection of the build/zip is important, as it will determine how hidden and stable ReZygisk will be. This, however, is not a hard task:
+-   `release` 版本应该是大多数情况下的选择，它移除了应用层级的日志记录，并提供更优化的二进制文件。
+-   `debug` 版本则相反，它包含大量日志记录且没有优化。因此，**你应仅在调试目的**以及**为创建 Issue 而获取日志时**使用它。
 
-- `release` should be the one chosen for most cases, it removes app-level logging and offers more optimized binaries.
-- `debug`, however, offers the opposite, with heavy logging and no optimizations, For this reason, **you should only use it for debugging purposes** and **when obtaining logs for creating an Issue**.
+至于分支，你应始终使用 `main` 分支，除非开发者另有说明，或者你想测试即将推出的功能并知晓其中涉及的风险。
 
-As for branches, you should always use the `main` branch, unless told otherwise by the developers, or if you want to test upcoming features and are aware of the risks involved.
+### 2. 刷入 zip 文件
 
-### 2. Flash the zip
+选择正确的版本后，你应该使用当前的 root 管理器（如 Magisk 或 KernelSU）刷入它。你可以进入 root 管理器的 `模块` 部分，然后选择你下载的 zip 文件来完成此操作。
 
-After choosing the right build, you should flash it using your current root manager, like Magisk or KernelSU. You can do this by going to the `Modules` section of your root manager and selecting the zip you downloaded.
-
-After flashing, check the installation logs to ensure there are no errors, and if everything is fine, you can reboot your device.
+刷入后，检查安装日志以确保没有错误。如果一切正常，你可以重启设备。
 
 > [!WARNING]
-> Magisk users should disable built-in Zygisk, as it will conflict with ReZygisk. This can be done by going to the `Settings` section of Magisk and disabling the `Zygisk` option.
+> Magisk 用户应禁用内置的 Zygisk，因为它会与 ReZygisk 冲突。这可以通过进入 Magisk 的 `设置` 部分并禁用 `Zygisk` 选项来完成。
 
-### 3. Verify the installation
+### 3. 验证安装
 
-After rebooting, you can verify if ReZygisk is working properly by checking the module description in the `Modules` section of your root manager. The description should indicate that the necessary daemons are running. For example, if your environment supports both 64-bit and 32-bit, it should look similar to this: `[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅] Standalone implementation of Zygisk.`
+重启后，你可以通过检查 root 管理器 `模块` 部分中的模块描述来验证 ReZygisk 是否正常工作。描述应指示必要的守护进程正在运行。例如，如果你的环境同时支持 64 位和 32 位，它应类似于这样：`[Monitor: ✅, ReZygisk 64-bit: ✅, ReZygisk 32-bit: ✅] Standalone implementation of Zygisk.`
 
-## Translation
+## 许可证
 
-There are currently two different ways to contribute translations for ReZygisk:
-
-- For translations of the README, you can create a new file in the `READMEs` folder, following the naming convention of `README_<language>.md`, where `<language>` is the language code (e.g., `README_pt-BR.md` for Brazilian Portuguese), and open a pull request to the `main` branch with your changes.
-- For translations of the ReZygisk WebUI, you should first contribute to our [Crowdin](https://crowdin.com/project/rezygisk). Once approved retrieve the `.json` file from there and open a pull request with your changes -- adding the `.json` file to the `webroot/lang` folder and your credits to the `TRANSLATOR.md` file, in alphabetic order.
-
-## Support
-
-For any question related to ReZygisk or other PerformanC projects, feel free to join any of the following channels below:
-
-- Discord Channel: [PerformanC](https://discord.gg/uPveNfTuCJ)
-- ReZygisk Telegram Channel: [@rezygisk](https://t.me/rezygisk)
-- PerformanC Telegram Channel: [@performancorg](https://t.me/performancorg)
-- PerformanC Signal Group: [@performanc](https://signal.group/#CjQKID3SS8N5y4lXj3VjjGxVJnzNsTIuaYZjj3i8UhipAS0gEhAedxPjT5WjbOs6FUuXptcT)
-
-## Contribution
-
-It is mandatory to follow PerformanC's [Contribution Guidelines](https://github.com/PerformanC/contributing) to contribute to ReZygisk. Following its Security Policy, Code of Conduct, and syntax standard.
-
-## License
-
-ReZygisk is licensed under [AGPL 3.0](./LICENSE). You can read more about it on [Open Source Initiative](https://opensource.org/licenses/AGPL-3.0).
+ReZygisk 采用 [AGPL 3.0](./LICENSE) 授权。你可以在 [开源倡议组织 (Open Source Initiative)](https://opensource.org/licenses/AGPL-3.0) 上了解更多相关信息。
