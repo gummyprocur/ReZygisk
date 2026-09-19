@@ -18,7 +18,6 @@ export const allMainPages = [
 ]
 
 export const allMiniPages = [
-  'mini_settings_language',
   'mini_settings_theme'
 ]
 
@@ -109,7 +108,7 @@ async function solveStrings(html, pageId) {
       }
     })
   } catch (e) {
-    toast(`Failed to load ${localStorage.getItem(`/${moduleName}/language`) || 'en_US'} strings. Entering safe mode.`)
+    toast('加载简体中文文本失败，正在进入安全模式。')
   }
 
   /* INFO: Perform navbar string replacement */
@@ -595,34 +594,24 @@ export async function reloadPage() {
   utils.reapplyListeners()
 }
 
-export function getStrings(pageId, forceDefault = false) {
-  return fetch(`lang/${forceDefault ? 'en_US' : (localStorage.getItem(`/${moduleName}/language`) || 'en_US')}.json`)
+export function getStrings(pageId) {
+  return fetch('lang/zh_CN.json')
     .then((response) => response.json())
     .then((data) => {
       return {
         ...data.pages[pageId],
         ...data.globals,
-        navbar: Object.fromEntries(allPages.map((page) => [page, data.pages[page].title]))
+        navbar: Object.fromEntries(
+          allPages.map((page) => [page, data.pages[page].title])
+        )
       }
     })
     .catch((err) => {
-      if (!forceDefault) {
-        toast('Error loading strings for the selected language, loading default (en_US) strings.')
-
-        return getStrings(pageId, true)
-      }
-
-      toast('Error loading default strings!')
-      console.error(`Failed to load default strings for page ${pageId}: `, err)
+      toast('加载简体中文语言文件失败')
+      console.error(`加载 zh_CN.json 失败，页面：${pageId}`, err)
 
       return false
     })
-}
-
-export function setLanguage(langId) {
-  localStorage.setItem(`/${moduleName}/language`, langId)
-
-  sufferedUpdate.length = 0
 }
 
 (async () => {
