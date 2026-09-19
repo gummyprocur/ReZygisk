@@ -1,6 +1,4 @@
 /* https://github.com/tiann/KernelSU/tree/main/js / https://www.npmjs.com/package/kernelsu */
-import { getDevelopmentExecResponse } from "./development_kit.js";
-
 let callbackCounter = 0;
 function getUniqueCallbackName(prefix) {
   return `${prefix}_callback_${Date.now()}_${callbackCounter++}`;
@@ -8,9 +6,7 @@ function getUniqueCallbackName(prefix) {
 
 export function exec(command, options) {
   if (typeof ksu === "undefined") {
-    /* INFO: Assume this is a computer for ReZygisk testing */
-
-    return getDevelopmentExecResponse(command);
+    return Promise.resolve({ errno: -1, stdout: "", stderr: "KernelSU API unavailable" });
   }
 
   if (typeof options === "undefined") {

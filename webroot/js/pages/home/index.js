@@ -11,7 +11,7 @@ let rzState = {
 async function _getReZygiskState() {
   let stateCmd = await exec('/system/bin/cat /data/adb/rezygisk/state.json')
   if (stateCmd.errno !== 0) {
-    toast('Error getting state of ReZygisk!')
+    toast('获取 ReZygisk 状态失败！')
 
     return;
   }
@@ -27,7 +27,7 @@ async function _getReZygiskState() {
 async function _getVersion() {
   let moduleProp = await exec('cat /data/adb/modules/rezygisk/module.prop')
   if (moduleProp.errno !== 0) {
-    toast('Error getting state of ReZygisk!')
+    toast('获取 ReZygisk 状态失败！')
 
     return;
   }
@@ -43,7 +43,7 @@ async function _getVersion() {
 async function _getKernelString() {
   const unameCmd = await exec('/system/bin/uname -r')
   if (unameCmd.errno !== 0) {
-    toast('Error getting kernel version!')
+    toast('获取内核版本失败！')
     return '???'
   }
 
@@ -57,7 +57,7 @@ async function _getKernelString() {
 async function _getAndroidVersion() {
   const androidVersionCmd = await exec('/system/bin/getprop ro.build.version.release')
   if (androidVersionCmd.errno !== 0) {
-    toast('Error getting android version!')
+    toast('获取 Android 版本失败！')
     return '???'
   }
 

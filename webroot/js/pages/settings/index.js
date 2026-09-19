@@ -32,10 +32,6 @@ export async function load() {
     ConfigState = JSON.parse(webui_config)
   }
 
-  utils.addListener(document.getElementById('lang_page_toggle'), 'click', () => {
-    loadPage('mini_settings_language')
-  })
-
   utils.addListener(document.getElementById('theme_page_toggle'), 'click', () => {
     loadPage('mini_settings_theme')
   })

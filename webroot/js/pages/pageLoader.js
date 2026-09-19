@@ -116,27 +116,6 @@ async function solveStrings(html, pageId) {
   return html
 }
 
-async function getPageScripts(pageId) {
-  if (miniPageRegex.test(pageId)) {
-    const miniPageIdData = miniPageRegex.exec(pageId)
-    const parentPage = miniPageIdData[1]
-    const miniPage = miniPageIdData[2]
-    return fetch(`js/pages/${parentPage}/minipage/${miniPage}/pageScripts`)
-      .then((response) => response.text())
-      .then((data) => {
-        return data
-      })
-      .catch(() => false)
-  } else {
-    return fetch(`js/pages/${pageId}/pageScripts`)
-      .then((response) => response.text())
-      .then((data) => {
-        return data
-      })
-      .catch(() => false)
-  }
-}
-
 async function getPageCSS(pageId) {
   if (miniPageRegex.test(pageId)) {
     const miniPageIdData = miniPageRegex.exec(pageId)
@@ -265,13 +244,6 @@ async function loadPages() {
         return;
       }
 
-      const pageJSScripts = await getPageScripts(page)
-      if (pageJSScripts === false) {
-        toast(`加载 ${page} 页面脚本失败`)
-
-        return;
-      }
-
       const pageContent = document.getElementById('page_content')
       const pageSpecificContent = document.createElement('div')
       pageSpecificContent.id = `${page}_content`
@@ -291,24 +263,6 @@ async function loadPages() {
 
         head.appendChild(cssCode)
       }
-
-      pageJSScripts.split('\n').forEach((line) => {
-        if (line.length === 0) return;
-
-        const jsCode = document.createElement('script')
-        jsCode.src = line
-        jsCode.type = 'module'
-        jsCode.id = `${page}_js`
-
-        const first = document.getElementsByTagName('script')[0]
-        if (!first) {
-          head.appendChild(jsCode)
-
-          return;
-        }
-
-        first.parentNode.insertBefore(jsCode, first)
-      })
 
       const pageJS = importPageJS(page)
       pageJS.then((module) => module.loadOnce())
@@ -630,7 +584,7 @@ window.addEventListener('error', function (event) {
 })
 
 window.addEventListener('unhandledrejection', function (event) {
-  toast('An error occurred. See log file.')
+  toast('发生错误，请查看日志文件')
 
   console.error('Unhandled promise rejection:', event.reason)
 

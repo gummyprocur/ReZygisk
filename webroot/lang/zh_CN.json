@@ -46,10 +46,6 @@
     },
     "settings": {
       "title": "设置",
-      "language": {
-        "title": "语言",
-        "description": "将 WebUI 的语言切换为所选语言。"
-      },
       "fullscreen": {
         "title": "禁用 WebUI 全屏模式",
         "description": "启用此选项后，WebUI 将不会占满整个屏幕。"
@@ -66,9 +62,6 @@
       "WebUIDevelopers": "WebUI 开发者",
       "orginalDevelopers": "原始模块开发者",
       "moduleLicense": "模块许可证"
-    },
-    "mini_settings_language": {
-      "title": "语言"
     },
     "mini_settings_theme": {
       "title": "更改 WebUI 主题",
