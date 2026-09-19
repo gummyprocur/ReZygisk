@@ -6,7 +6,6 @@ import { runMainPageTransition, runMiniPageEnter, runMiniPageLeave } from './ani
 /* INFO: Prototypes */
 import utils from './utils.js'
 
-const moduleName = 'TreatWheel'
 const head = document.getElementsByTagName('head')[0]
 const miniPageRegex = /mini_(.*)_(.*)/
 
@@ -261,14 +260,14 @@ async function loadPages() {
     allPages.forEach(async (page) => {
       const pageHTML = await loadHTML(page)
       if (pageHTML === false) {
-        toast('Error loading page')
+        toast('页面加载失败')
 
         return;
       }
 
       const pageJSScripts = await getPageScripts(page)
       if (pageJSScripts === false) {
-        toast(`Error while loading ${page} scripts`)
+        toast(`加载 ${page} 页面脚本失败`)
 
         return;
       }
@@ -493,7 +492,7 @@ export async function loadPage(pageId) {
   } catch (error) {
     /* INFO: Keep transition errors visible without breaking future navigation attempts. */
     console.error('Page transition failed:', error)
-    toast('Error while changing page.')
+    toast('切换页面失败')
 
     return false
   } finally {
@@ -518,7 +517,7 @@ function getMiniPage(miniPageId) {
 export async function loadMiniPage(miniPageId, unloadCb) {
   const minipage_html = await getMiniPage(miniPageId)
   if (!minipage_html) {
-    toast('Error loading minipage')
+    toast('小页面加载失败')
 
     return;
   }
@@ -623,7 +622,7 @@ export function getStrings(pageId) {
 
 /* INFO: Global error handling to catch any unhandled errors and log them to a file for debugging purposes. */
 window.addEventListener('error', function (event) {
-  toast('An error occurred. See log file.')
+  toast('发生错误，请查看日志文件')
 
   console.error('Unhandled error:', event.error)
 
