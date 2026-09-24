@@ -267,19 +267,17 @@ static int spawn_companion(char *restrict argv[], char *restrict name, int lib_f
 
 /* WARNING: Dynamic memory based */
 void zygiskd_start(char *restrict argv[]) {
-  /* INFO: When implementation is None or Multiple, it won't set the values
+  /* INFO: When implementation is None, it won't set the values
             for the context, causing it to have garbage values. In response
             to that, "= { 0 }" is used to ensure that the values are clean. */
   struct Context context = { 0 };
 
   struct root_impl impl;
   get_impl(&impl);
-  if (impl.impl == None || impl.impl == Multiple) {
+  if (impl.impl == None) {
     unix_datagram_sendto(CONTROLLER_SOCKET, &(uint8_t){ DAEMON_SET_ERROR_INFO }, sizeof(uint8_t));
 
-    const char *msg = NULL;
-    if (impl.impl == None) msg = "Unsupported environment: Unknown root implementation";
-    else msg = "Unsupported environment: Multiple root implementations found";
+    const char *msg = "Unsupported environment: KernelSU not found";
 
     LOGE("%s", msg);
 
@@ -374,7 +372,6 @@ void zygiskd_start(char *restrict argv[]) {
         ssize_t ret = read_uint32_t(client_fd, &uid);
         ASSURE_SIZE_READ("GetProcessFlags", "uid", ret, sizeof(uid), break);
 
-        /* INFO: Only used for Magisk, as it saves process names and not UIDs. */
         char process[PROCESS_NAME_MAX_LEN];
         ret = read_string(client_fd, process, sizeof(process));
         if (ret == -1) {
@@ -401,24 +398,8 @@ void zygiskd_start(char *restrict argv[]) {
           }
         }
 
-        switch (impl.impl) {
-          case None: { break; }
-          case Multiple: { break; }
-          case KernelSU: {
-            flags |= PROCESS_ROOT_IS_KSU;
-
-            break;
-          }
-          case APatch: {
-            flags |= PROCESS_ROOT_IS_APATCH;
-
-            break;
-          }
-          case Magisk: {
-            flags |= PROCESS_ROOT_IS_MAGISK;
-
-            break;
-          }
+        if (impl.impl == KernelSU) {
+          flags |= PROCESS_ROOT_IS_KSU;
         }
 
         ret = write_uint32_t(client_fd, flags);
@@ -429,24 +410,8 @@ void zygiskd_start(char *restrict argv[]) {
       case GetInfo: {
         uint32_t flags = 0;
 
-        switch (impl.impl) {
-          case None: { break; }
-          case Multiple: { break; }
-          case KernelSU: {
-            flags |= PROCESS_ROOT_IS_KSU;
-
-            break;
-          }
-          case APatch: {
-            flags |= PROCESS_ROOT_IS_APATCH;
-
-            break;
-          }
-          case Magisk: {
-            flags |= PROCESS_ROOT_IS_MAGISK;
-
-            break;
-          }
+        if (impl.impl == KernelSU) {
+          flags |= PROCESS_ROOT_IS_KSU;
         }
 
         ssize_t ret = write_uint32_t(client_fd, flags);

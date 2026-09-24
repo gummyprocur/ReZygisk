@@ -461,24 +461,9 @@ void stringify_root_impl_name(struct root_impl impl, char *restrict output) {
 
       break;
     }
-    case Multiple: {
-      strcpy(output, "Multiple");
-
-      break;
-    }
     case KernelSU: {
       if (impl.variant == KOfficial) strcpy(output, "KernelSU");
       else strcpy(output, "KernelSU Next");
-
-      break;
-    }
-    case APatch: {
-      strcpy(output, "APatch");
-
-      break;
-    }
-    case Magisk: {
-      strcpy(output, "Magisk");
 
       break;
     }
@@ -669,6 +654,8 @@ bool parse_mountinfo(const char *restrict pid, struct mountinfos *restrict mount
 }
 
 bool umount_root(struct root_impl impl) {
+  (void)impl;
+
   /* INFO: We are already in the target pid mount namespace, so actually,
              when we use self here, we meant its pid.
   */
@@ -679,9 +666,7 @@ bool umount_root(struct root_impl impl) {
     return false;
   }
 
-  const char *source_name = "magisk";
-  if (impl.impl == KernelSU) source_name = "KSU";
-  else if (impl.impl == APatch) source_name = "APatch";
+  const char *source_name = "KSU";
 
   LOGI("[%s] Unmounting root", source_name);
 
@@ -692,7 +677,7 @@ bool umount_root(struct root_impl impl) {
     struct mountinfo mount = mounts.mounts[i];
 
     bool should_unmount = false;
-    if (strcmp(mount.source, source_name) == 0 || (impl.impl == Magisk && strcmp(mount.source, "worker") == 0)) should_unmount = true;
+    if (strcmp(mount.source, source_name) == 0) should_unmount = true;
     if (strncmp(mount.target, "/data/adb/modules", strlen("/data/adb/modules")) == 0) should_unmount = true;
     if (strncmp(mount.root, "/adb/modules/", strlen("/adb/modules/")) == 0) should_unmount = true;
 

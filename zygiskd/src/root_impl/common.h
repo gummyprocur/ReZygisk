@@ -9,10 +9,7 @@
 
 enum root_impls {
   None,
-  Multiple,
-  KernelSU,
-  APatch,
-  Magisk
+  KernelSU
 };
 
 struct root_impl_state {
